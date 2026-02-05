@@ -15,13 +15,17 @@ I have established a localized SOC lab on a **192.168.1.0/24** subnet using Virt
 # Tests
 
 **Test 1:** The first test is to simply manually poke SSH and login with valid & invalid credentials to the endpoint and see how they are appearing in the Threat Hunting section of Wazuh.
+
 **Results:** When logging into the endpoint using SSH with valid credentials, 2 events are generated and visible, sshd: authentication success and PAM: Login session opened. Under the events tab additional information is viewable such as the source IP address. Similar events are geenrated when logging in with invalid credentials.
+
 **Test 2:** This next test is to compare how Wazuh shows a basic brute force attack via SSH using Hydra. The command I'm running attempts to log onto the server using root as the user and the popular rockyou.txt password list.
 ```
 hydra -l root -P /usr/share/wordlists/rockyou.txt ssh://192.168.1.106
 ```
 **Results:** The result of running this attack for just 1 minute has created 622 Authentication failure events. The severity of the failures is also greater than before as Wazuh detects that such a large number of alerts in a short period of time is likely to be an attack. Wazuh has ranked many of these enents as Level 10 events (out of a max of 15) which according to the Wazuh documentation may indicate an attack.
+
 **Test 3:** This next test is to explore the file integrity monitoring in Wazuh. In this test, I appended some randome text to the bottom od the /etc/passwd file hoping to create a file integrity event.
+
 **Results:** Initially, I didn't get any alerts which was strange until I consulted the Wazuh documentation and found that the file integrity monitoring only performs a pass of monitored files every 12 hours. I found this inadequate and modified the ossec.conf file to perform realtime monitoring on the /etc, /usr/bin, /usr/sbin directories with the following modification.
 ```
 <directories realtime="yes">/etc,/usr/bin,/usr/sbin</directories>
