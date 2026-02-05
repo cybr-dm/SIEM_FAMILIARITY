@@ -18,11 +18,19 @@ I have established a localized SOC lab on a **192.168.1.0/24** subnet using Virt
 
 **Results:** When logging into the endpoint using SSH with valid credentials, 2 events are generated and visible, sshd: authentication success and PAM: Login session opened. Under the events tab additional information is viewable such as the source IP address. Similar events are geenrated when logging in with invalid credentials.
 
+<img width="2533" height="1163" alt="image" src="https://github.com/user-attachments/assets/30c11e89-fb5a-4e95-a5a5-c79c7c5c2b18" />
+
+<img width="2512" height="1181" alt="image" src="https://github.com/user-attachments/assets/b8d8205e-2d8b-4d05-ba37-d47e4e8ae4ca" />
+
+
 **Test 2:** This next test is to compare how Wazuh shows a basic brute force attack via SSH using Hydra. The command I'm running attempts to log onto the server using root as the user and the popular rockyou.txt password list.
 ```
 hydra -l root -P /usr/share/wordlists/rockyou.txt ssh://192.168.1.106
 ```
 **Results:** The result of running this attack for just 1 minute has created 622 Authentication failure events. The severity of the failures is also greater than before as Wazuh detects that such a large number of alerts in a short period of time is likely to be an attack. Wazuh has ranked many of these enents as Level 10 events (out of a max of 15) which according to the Wazuh documentation may indicate an attack.
+
+<img width="2518" height="1121" alt="image" src="https://github.com/user-attachments/assets/5cd595e9-d59d-4591-b123-c834a0180f7b" />
+
 
 **Test 3:** This next test is to explore the file integrity monitoring in Wazuh. In this test, I appended some randome text to the bottom od the /etc/passwd file hoping to create a file integrity event.
 
@@ -31,3 +39,6 @@ hydra -l root -P /usr/share/wordlists/rockyou.txt ssh://192.168.1.106
 <directories realtime="yes">/etc,/usr/bin,/usr/sbin</directories>
 ```
 After Restarting the agent service these modifications to /etc/passwd immediately appear in the events tab with a default level of 7 and description of Integrity checksum changed.
+
+<img width="2537" height="722" alt="image" src="https://github.com/user-attachments/assets/ea66c40e-4ba1-4033-aaa1-fa98cdc771e6" />
+
